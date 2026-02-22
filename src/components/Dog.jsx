@@ -1,26 +1,26 @@
 import React from 'react'
-import { Canvas, useThree} from '@react-three/fiber'
+import { Canvas, useThree } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 
 const Dog = () => {
 
 
-    useThree(({camera, scene, gl}) => {
+    useThree(({ camera, scene, gl }) => {
         console.log(camera.position)
     })
 
 
     return (
-        <>   
+        <>
 
 
-        <OrbitControls />
-        
-        
+            <OrbitControls />
+
+
         </>
 
-    
-  )
+
+    )
 }
 
 export default Dog

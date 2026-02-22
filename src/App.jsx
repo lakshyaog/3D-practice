@@ -1,15 +1,499 @@
 import './App.css'
-import Dog from './components/Dog'
-import { Canvas } from '@react-three/fiber'
+import BmwModel from './components/BmwModel'
+import TypewriterTitle from './components/TypewriterTitle'
+import TypewriterText from './components/TypewriterText'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Environment, ContactShadows } from '@react-three/drei'
+import { Suspense, useRef, useEffect, useState } from 'react'
+import { motion } from 'motion/react'
+import * as THREE from 'three'
 
-function App() {
-  
+// ===== WELCOME SCREEN LINES =====
+const WELCOME_LINES = [
+  'Welcome to the future of driving',
+  'Where precision meets passion',
+  'Engineered for those who lead',
+  'Designed for those who dare',
+  "Performance you don't just drive",
+  'You feel it',
+  'Every curve',
+  'Every acceleration',
+  'Every moment',
+  'Crafted with German excellence',
+  'Powered by innovation',
+  'Driven by intelligence',
+  'Luxury without compromise',
+  'Speed with purpose',
+  'Control in every detail',
+  'Where technology becomes emotion',
+  'Where roads become experiences',
+  'Built for the bold',
+  'Made for the visionary',
+  'A legacy of performance',
+  'A promise of perfection',
+  'This is not just a car',
+  "It's a statement",
+  "It's confidence",
+  "It's control",
+  "It's evolution",
+  "It's ambition in motion",
+  "It's the ultimate driving machine",
+  'Welcome to BMW',
+]
+
+// ===== CAMERA KEYFRAMES =====
+// PHASE 1 (Sections 1-3): Orbit around the EXTERIOR — camera stays far out
+// PHASE 2 (Sections 4-5): Zoom INTO the car interior — camera dives in close
+const CAMERA_KEYFRAMES = [
+  // --- PHASE 1: EXTERIOR ORBIT (far out, circling the car) ---
+  { pos: [12, 4, 10], target: [0, 0, 0] },      // 0%  - front-right wide establishing
+  { pos: [0, 3.5, 14], target: [0, 0, 0] },      // 20% - pure right side
+  { pos: [-12, 3.5, 6], target: [0, 0, 0] },      // 40% - front-left angle
+  { pos: [-8, 3, -10], target: [0, 0, 0] },      // 60% - rear-left quarter
+
+  // --- PHASE 2: ZOOM INTO INTERIOR (closing in) ---
+  { pos: [3, 1.5, 3], target: [0, 0.5, 0] },    // 80% - approaching the body
+  { pos: [0.8, 0.8, 0.5], target: [0.3, 0.5, 0] }, // 100% - deep inside
+]
+
+// ===== SCROLL-DRIVEN CAMERA CONTROLLER =====
+function ScrollCamera({ scrollRef }) {
+  const { camera } = useThree()
+  const targetPos = useRef(new THREE.Vector3(...CAMERA_KEYFRAMES[0].pos))
+  const targetLookAt = useRef(new THREE.Vector3(...CAMERA_KEYFRAMES[0].target))
+  const time = useRef(0)
+
+  useFrame((_, delta) => {
+    time.current += delta
+    const progress = scrollRef.current
+
+    // Determine which keyframe segment we're in
+    const segmentCount = CAMERA_KEYFRAMES.length - 1
+    const rawSegment = progress * segmentCount
+    const segment = Math.min(Math.floor(rawSegment), segmentCount - 1)
+    const segmentProgress = rawSegment - segment
+
+    // Smooth easing for segment progress
+    const eased = segmentProgress * segmentProgress * (3 - 2 * segmentProgress) // smoothstep
+
+    const from = CAMERA_KEYFRAMES[segment]
+    const to = CAMERA_KEYFRAMES[Math.min(segment + 1, segmentCount)]
+
+    // Lerp position between keyframes
+    const newX = THREE.MathUtils.lerp(from.pos[0], to.pos[0], eased)
+    const newY = THREE.MathUtils.lerp(from.pos[1], to.pos[1], eased)
+    const newZ = THREE.MathUtils.lerp(from.pos[2], to.pos[2], eased)
+
+    // Subtle orbital drift (decreases as we zoom in)
+    const driftAmount = 0.15 * (1 - progress * 0.9)
+    const driftX = Math.sin(time.current * 0.25) * driftAmount
+    const driftZ = Math.cos(time.current * 0.25) * driftAmount
+
+    targetPos.current.set(newX + driftX, newY, newZ + driftZ)
+
+    // Lerp lookAt target
+    targetLookAt.current.set(
+      THREE.MathUtils.lerp(from.target[0], to.target[0], eased),
+      THREE.MathUtils.lerp(from.target[1], to.target[1], eased),
+      THREE.MathUtils.lerp(from.target[2], to.target[2], eased)
+    )
+
+    // Smooth camera movement (damped follow)
+    camera.position.lerp(targetPos.current, 0.06)
+    camera.lookAt(targetLookAt.current)
+  })
+
+  return null
+}
+
+// ===== WELCOME TYPEWRITER (cycles through lines) =====
+function WelcomeTypewriter({ lines }) {
+  const [lineIndex, setLineIndex] = useState(0)
+  const [fade, setFade] = useState(true)
+
+  useEffect(() => {
+    const lineLength = lines[lineIndex].length
+    const typingTime = lineLength * 40 // 40ms per character
+    const displayTime = typingTime + 1200 // typing + 1.2s pause
+
+    const timer = setTimeout(() => {
+      setFade(false) // fade out
+      setTimeout(() => {
+        setLineIndex((prev) => (prev + 1) % lines.length)
+        setFade(true) // fade in next
+      }, 500) // 500ms fade transition
+    }, displayTime)
+
+    return () => clearTimeout(timer)
+  }, [lineIndex, lines])
+
   return (
-  <>  
-     <Canvas>
-       <Dog /> 
-     </Canvas>
-   </>
+    <div className={`welcome-line ${fade ? 'visible' : ''}`}>
+      <TypewriterText key={lineIndex} speed={40}>
+        {lines[lineIndex]}
+      </TypewriterText>
+    </div>
+  )
+}
+
+// ===== TYPEWRITER SEQUENCES =====
+const BMW_SEQUENCES = [
+  { text: 'The New BMW M4 Competition', deleteAfter: true, pauseAfter: 2500 },
+  { text: '530 HP · S58 Engine', deleteAfter: true, pauseAfter: 2000 },
+  { text: 'Born on the Racetrack', deleteAfter: false, pauseAfter: 3000 },
+]
+
+// ===== MAIN APP =====
+function App() {
+  const [modelLoaded, setModelLoaded] = useState(false)
+  const scrollRef = useRef(0)
+  const containerRef = useRef(null)
+  const audioRef = useRef(null)
+  const audioStarted = useRef(false)
+  const audioUnlocked = useRef(false)
+  const scrollTimeout = useRef(null)
+
+
+  // Initialize audio + unlock on first user click
+  useEffect(() => {
+    const audio = new Audio('/car-start.wav')
+    audio.volume = 0.6
+    audio.preload = 'auto'
+    audio.currentTime = 7
+    audioRef.current = audio
+
+    // Stop at 14s
+    const handleTimeUpdate = () => {
+      if (audio.currentTime >= 14) {
+        audio.pause()
+        audio.currentTime = 7
+        audioStarted.current = false
+      }
+    }
+    audio.addEventListener('timeupdate', handleTimeUpdate)
+
+    // Unlock audio on first click (required by browser autoplay policy)
+    const unlockAudio = () => {
+      audio.play().then(() => {
+        audio.pause()
+        audio.currentTime = 7
+        audioUnlocked.current = true
+
+      }).catch(() => { })
+      document.removeEventListener('click', unlockAudio)
+    }
+    document.addEventListener('click', unlockAudio)
+
+    return () => {
+      audio.removeEventListener('timeupdate', handleTimeUpdate)
+      document.removeEventListener('click', unlockAudio)
+      audio.pause()
+    }
+  }, [])
+
+  // Track scroll position + control audio
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container
+      const maxScroll = scrollHeight - clientHeight
+      const progress = maxScroll > 0 ? Math.max(0, Math.min(1, scrollTop / maxScroll)) : 0
+      scrollRef.current = progress
+
+      const audio = audioRef.current
+      if (!audio || !audioUnlocked.current) return
+
+      if (progress > 0.01) {
+        // Start audio on first scroll
+        if (!audioStarted.current) {
+          audio.currentTime = 7
+          audio.play().catch(() => { })
+          audioStarted.current = true
+        }
+
+        // Resume if paused from idle
+        if (audio.paused && audioStarted.current) {
+          audio.play().catch(() => { })
+        }
+
+        // Clear pending pause timeout
+        if (scrollTimeout.current) {
+          clearTimeout(scrollTimeout.current)
+        }
+
+        // Pause after 500ms of no scrolling
+        scrollTimeout.current = setTimeout(() => {
+          if (audio && !audio.paused) {
+            audio.pause()
+          }
+        }, 500)
+
+      } else {
+        // Back at top — stop and reset
+        audio.pause()
+        audio.currentTime = 7
+        audioStarted.current = false
+        if (scrollTimeout.current) {
+          clearTimeout(scrollTimeout.current)
+        }
+      }
+    }
+
+    container.addEventListener('scroll', handleScroll, { passive: true })
+    return () => container.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  return (
+    <div className="app-root">
+      {/* ===== FIXED 3D CANVAS ===== */}
+      <div className="canvas-fixed">
+        <Canvas
+          camera={{ position: [12, 4, 10], fov: 45 }}
+          shadows
+          dpr={[1, 2]}
+          onCreated={() => {
+            setTimeout(() => setModelLoaded(true), 20000)
+          }}
+        >
+          <Suspense fallback={null}>
+            <ambientLight intensity={0.3} />
+            <directionalLight
+              position={[10, 10, 5]}
+              intensity={1.5}
+              castShadow
+              shadow-mapSize-width={2048}
+              shadow-mapSize-height={2048}
+            />
+            <spotLight
+              position={[-10, 15, -5]}
+              angle={0.3}
+              penumbra={1}
+              intensity={0.8}
+              castShadow
+            />
+            <Environment preset="city" />
+            <BmwModel scale={1} position={[0, -0.5, 0]} />
+            <ContactShadows
+              position={[0, -0.5, 0]}
+              opacity={0.5}
+              scale={12}
+              blur={2.5}
+              far={4}
+            />
+            <ScrollCamera scrollRef={scrollRef} />
+          </Suspense>
+        </Canvas>
+      </div>
+
+      {/* ===== SCROLLABLE CONTENT ===== */}
+      <div className="scroll-container" ref={containerRef}>
+
+        {/* ---- SECTION 1: HERO ---- */}
+        <section className="scroll-section section-hero">
+          <motion.div
+            className="section-content section-left"
+            initial={{ opacity: 0, y: 60 }}
+            animate={{ opacity: modelLoaded ? 1 : 0, y: modelLoaded ? 0 : 60 }}
+            transition={{ duration: 1.2, ease: 'easeOut', delay: 0.5 }}
+          >
+            <div className="badge">
+              <span className="badge-dot"></span>
+              M PERFORMANCE
+            </div>
+
+            <TypewriterTitle
+              sequences={BMW_SEQUENCES}
+              typingSpeed={55}
+              startDelay={1000}
+              autoLoop={true}
+              loopDelay={2000}
+              deleteSpeed={30}
+              pauseBeforeDelete={2500}
+              naturalVariance={true}
+              className="hero-typewriter"
+            />
+
+            <p className="hero-description">
+              The New M4 Competition M xDrive combines aesthetics and the sportiness
+              you expect from BMW M.
+            </p>
+
+            <div className="scroll-hint">
+              <span className="scroll-hint-text">Scroll to explore</span>
+              <div className="scroll-hint-line">
+                <div className="scroll-hint-dot"></div>
+              </div>
+            </div>
+          </motion.div>
+        </section>
+
+        {/* ---- SECTION 2: SIDE PROFILE (Exterior) ---- */}
+        <section className="scroll-section section-engine">
+          <motion.div
+            className="section-content section-right"
+            initial={{ opacity: 0, x: 80 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.9, ease: 'easeOut' }}
+            viewport={{ once: false, amount: 0.4 }}
+          >
+            <span className="section-tag">EXTERIOR · SIDE PROFILE</span>
+            <h2 className="section-title">Sculpted for Speed</h2>
+            <p className="section-text">
+              The muscular side profile reveals the M4's widebody stance —
+              flared fenders house massive 19" forged wheels, while the carbon-fiber
+              roof line drops aggressively toward the rear. Every crease is
+              aerodynamically optimized for <span className="highlight">maximum downforce</span>.
+            </p>
+            <div className="spec-grid">
+              <div className="spec-item">
+                <span className="spec-value">19"</span>
+                <span className="spec-unit">Forged Wheels</span>
+              </div>
+              <div className="spec-item">
+                <span className="spec-value">CFRP</span>
+                <span className="spec-unit">Carbon Roof</span>
+              </div>
+            </div>
+          </motion.div>
+        </section>
+
+        {/* ---- SECTION 3: REAR VIEW (Exterior) ---- */}
+        <section className="scroll-section section-design">
+          <motion.div
+            className="section-content section-left"
+            initial={{ opacity: 0, x: -80 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.9, ease: 'easeOut' }}
+            viewport={{ once: false, amount: 0.4 }}
+          >
+            <span className="section-tag">EXTERIOR · REAR</span>
+            <h2 className="section-title">Aerodynamic Precision</h2>
+            <p className="section-text">
+              The rear diffuser and quad exhaust tips are pure M DNA. A subtle
+              lip spoiler and aggressive bumper design channel airflow for
+              stability at <span className="highlight">290 km/h</span>. The iconic
+              L-shaped taillights complete the unmistakable M4 signature.
+            </p>
+            <div className="spec-grid">
+              <div className="spec-item">
+                <span className="spec-value">0.36</span>
+                <span className="spec-unit">Cd Drag</span>
+              </div>
+              <div className="spec-item">
+                <span className="spec-value">290</span>
+                <span className="spec-unit">km/h Top Speed</span>
+              </div>
+            </div>
+          </motion.div>
+        </section>
+
+        {/* ---- SECTION 4: CLOSE-UP / ENTERING (Interior Phase) ---- */}
+        <section className="scroll-section section-performance">
+          <motion.div
+            className="section-content section-right"
+            initial={{ opacity: 0, x: 80 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.9, ease: 'easeOut' }}
+            viewport={{ once: false, amount: 0.4 }}
+          >
+            <span className="section-tag">POWERTRAIN · HEART</span>
+            <h2 className="section-title">The Iconic S58</h2>
+            <p className="section-text">
+              Step closer. The iconic S58 inline-6 engine pushes out a mighty
+              <span className="highlight"> 390 kW (530 hp)</span>. The M xDrive
+              all-wheel-drive distributes power for maximum traction — 0-100 km/h
+              in just <span className="highlight">3.4 seconds</span>.
+            </p>
+            <div className="spec-grid spec-grid-3">
+              <div className="spec-item">
+                <span className="spec-value">530</span>
+                <span className="spec-unit">HP</span>
+              </div>
+              <div className="spec-item">
+                <span className="spec-value">650</span>
+                <span className="spec-unit">Nm Torque</span>
+              </div>
+              <div className="spec-item">
+                <span className="spec-value">3.4s</span>
+                <span className="spec-unit">0-100 km/h</span>
+              </div>
+            </div>
+          </motion.div>
+        </section>
+
+        {/* ---- SECTION 5: DEEP INSIDE / COCKPIT (Interior Phase) ---- */}
+        <section className="scroll-section section-cta">
+          <motion.div
+            className="section-content section-center"
+            initial={{ opacity: 0, y: 60, scale: 0.95 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 1, ease: 'easeOut' }}
+            viewport={{ once: false, amount: 0.4 }}
+          >
+            <span className="section-tag">COCKPIT · INSIDE</span>
+            <h2 className="section-title cta-title">Your Driver's Seat</h2>
+            <p className="section-text cta-text">
+              You're inside. M Sport bucket seats, a 14.9" curved display,
+              M carbon-fiber trim, and the iconic M steering wheel with
+              shift paddles. Every detail is built for the driver. Configure yours now.
+            </p>
+            <div className="cta-buttons">
+              <button className="btn-primary" id="discover-btn">
+                Configure Yours
+                <span className="btn-arrow">→</span>
+              </button>
+              <button className="btn-secondary" id="configure-btn">
+                Explore Interior
+              </button>
+            </div>
+          </motion.div>
+        </section>
+      </div>
+
+      {/* ===== FIXED NAVBAR ===== */}
+      <motion.header
+        className="fixed-nav"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: modelLoaded ? 1 : 0, y: modelLoaded ? 0 : -20 }}
+        transition={{ duration: 0.8, delay: 0.3 }}
+      >
+        <div className="logo">
+          <svg className="bmw-logo" viewBox="0 0 48 48" fill="none">
+            <circle cx="24" cy="24" r="23" stroke="white" strokeWidth="2" />
+            <path d="M24 1C24 1 24 24 24 24C24 24 1 24 1 24" fill="rgba(0,160,233,0.8)" />
+            <path d="M24 1C24 1 47 24 47 24C47 24 24 24 24 24" fill="white" fillOpacity="0.9" />
+            <path d="M24 47C24 47 24 24 24 24C24 24 47 24 47 24" fill="rgba(0,160,233,0.8)" />
+            <path d="M24 47C24 47 1 24 1 24C1 24 24 24 24 24" fill="white" fillOpacity="0.9" />
+            <text x="24" y="28" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">BMW</text>
+          </svg>
+        </div>
+        <nav className="nav-links">
+          <a href="#" className="nav-link">Models</a>
+          <a href="#" className="nav-link">Build Yours</a>
+          <a href="#" className="nav-link">Experience</a>
+          <a href="#" className="nav-link active">M Performance</a>
+        </nav>
+      </motion.header>
+
+
+      {/* ===== LOADING / WELCOME SCREEN ===== */}
+      {!modelLoaded && (
+        <div className="loading-screen">
+          <img
+            src="/bmw-m4-splash.jpg"
+            alt="BMW M4 Competition"
+            className="loading-image"
+          />
+          <div className="welcome-overlay">
+            <div className="welcome-text-wrapper">
+              <WelcomeTypewriter lines={WELCOME_LINES} />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
 
