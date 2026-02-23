@@ -42,18 +42,17 @@ const WELCOME_LINES = [
 ]
 
 // ===== CAMERA KEYFRAMES =====
-// PHASE 1 (Sections 1-3): Orbit around the EXTERIOR — camera stays far out
-// PHASE 2 (Sections 4-5): Zoom INTO the car interior — camera dives in close
+// Full exterior orbit — camera stays outside the car at all times
 const CAMERA_KEYFRAMES = [
-  // --- PHASE 1: EXTERIOR ORBIT (far out, circling the car) ---
-  { pos: [12, 4, 10], target: [0, 0, 0] },      // 0%  - front-right wide establishing
+  // --- Wide establishing shots ---
+  { pos: [12, 4, 10], target: [0, 0, 0] },       // 0%  - front-right wide establishing
   { pos: [0, 3.5, 14], target: [0, 0, 0] },      // 20% - pure right side
-  { pos: [-12, 3.5, 6], target: [0, 0, 0] },      // 40% - front-left angle
+  { pos: [-12, 3.5, 6], target: [0, 0, 0] },     // 40% - front-left angle
   { pos: [-8, 3, -10], target: [0, 0, 0] },      // 60% - rear-left quarter
 
-  // --- PHASE 2: ZOOM INTO INTERIOR (closing in) ---
-  { pos: [3, 1.5, 3], target: [0, 0.5, 0] },    // 80% - approaching the body
-  { pos: [0.8, 0.8, 0.5], target: [0.3, 0.5, 0] }, // 100% - deep inside
+  // --- Closer exterior angles (no interior) ---
+  { pos: [6, 2, -8], target: [0, 0.3, 0] },      // 80% - rear-right low angle
+  { pos: [10, 3, 4], target: [0, 0.2, 0] },      // 100% - front-right dramatic close
 ]
 
 // ===== SCROLL-DRIVEN CAMERA CONTROLLER =====
@@ -389,7 +388,7 @@ function App() {
           </motion.div>
         </section>
 
-        {/* ---- SECTION 4: CLOSE-UP / ENTERING (Interior Phase) ---- */}
+        {/* ---- SECTION 4: REAR-RIGHT LOW ANGLE ---- */}
         <section className="scroll-section section-performance">
           <motion.div
             className="section-content section-right"
@@ -423,7 +422,7 @@ function App() {
           </motion.div>
         </section>
 
-        {/* ---- SECTION 5: DEEP INSIDE / COCKPIT (Interior Phase) ---- */}
+        {/* ---- SECTION 5: FRONT DRAMATIC CLOSE ---- */}
         <section className="scroll-section section-cta">
           <motion.div
             className="section-content section-center"
@@ -432,8 +431,8 @@ function App() {
             transition={{ duration: 1, ease: 'easeOut' }}
             viewport={{ once: false, amount: 0.4 }}
           >
-            <span className="section-tag">COCKPIT · INSIDE</span>
-            <h2 className="section-title cta-title">Your Driver's Seat</h2>
+            <span className="section-tag">EXPERIENCE · DRIVE</span>
+            <h2 className="section-title cta-title">Own the Road</h2>
             <p className="section-text cta-text">
               You're inside. M Sport bucket seats, a 14.9" curved display,
               M carbon-fiber trim, and the iconic M steering wheel with
@@ -460,21 +459,9 @@ function App() {
         transition={{ duration: 0.8, delay: 0.3 }}
       >
         <div className="logo">
-          <svg className="bmw-logo" viewBox="0 0 48 48" fill="none">
-            <circle cx="24" cy="24" r="23" stroke="white" strokeWidth="2" />
-            <path d="M24 1C24 1 24 24 24 24C24 24 1 24 1 24" fill="rgba(0,160,233,0.8)" />
-            <path d="M24 1C24 1 47 24 47 24C47 24 24 24 24 24" fill="white" fillOpacity="0.9" />
-            <path d="M24 47C24 47 24 24 24 24C24 24 47 24 47 24" fill="rgba(0,160,233,0.8)" />
-            <path d="M24 47C24 47 1 24 1 24C1 24 24 24 24 24" fill="white" fillOpacity="0.9" />
-            <text x="24" y="28" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">BMW</text>
-          </svg>
+          <img src="/bmw.jpeg" alt="BMW Logo" className="bmw-logo" />
         </div>
-        <nav className="nav-links">
-          <a href="#" className="nav-link">Models</a>
-          <a href="#" className="nav-link">Build Yours</a>
-          <a href="#" className="nav-link">Experience</a>
-          <a href="#" className="nav-link active">M Performance</a>
-        </nav>
+
       </motion.header>
 
 
