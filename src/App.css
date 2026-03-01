@@ -41,9 +41,8 @@ body,
   z-index: 10;
   width: 100%;
   height: 100vh;
-  overflow-y: auto;
+  overflow-y: scroll;
   overflow-x: hidden;
-  scroll-behavior: smooth;
 
   /* Hide scrollbar but keep functionality */
   scrollbar-width: none;
@@ -536,14 +535,54 @@ body,
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: 8vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8vh 40px 40px;
   background: linear-gradient(to top,
       rgba(0, 0, 0, 0.85) 0%,
       rgba(0, 0, 0, 0.4) 40%,
       rgba(0, 0, 0, 0.2) 60%,
       rgba(0, 0, 0, 0.6) 100%);
+}
+
+/* ===== SKIP INTRO BUTTON ===== */
+.skip-intro-btn {
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  color: rgba(255, 255, 255, 0.6);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  padding: 10px 22px;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.skip-intro-btn:hover {
+  background: rgba(0, 102, 177, 0.18);
+  border-color: rgba(0, 160, 233, 0.45);
+  color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 20px rgba(0, 160, 233, 0.2);
+}
+
+.skip-arrow {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.3s ease;
+}
+
+.skip-intro-btn:hover .skip-arrow {
+  transform: translateX(3px);
 }
 
 .welcome-text-wrapper {

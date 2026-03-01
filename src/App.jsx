@@ -3,10 +3,14 @@ import BmwModel from './components/BmwModel'
 import TypewriterTitle from './components/TypewriterTitle'
 import TypewriterText from './components/TypewriterText'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Environment, ContactShadows } from '@react-three/drei'
+import { Environment, ContactShadows, MeshReflectorMaterial } from '@react-three/drei'
 import { Suspense, useRef, useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 import * as THREE from 'three'
+import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib'
+
+// Required for rectAreaLight to work in Three.js
+RectAreaLightUniformsLib.init()
 
 // ===== WELCOME SCREEN LINES =====
 const WELCOME_LINES = [
@@ -105,6 +109,83 @@ function ScrollCamera({ scrollRef }) {
   return null
 }
 
+// ===== SHOWROOM ENVIRONMENT =====
+function Showroom() {
+  return (
+    <group>
+      {/* ── Polished Reflective Floor ── */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.51, 0]} receiveShadow>
+        <planeGeometry args={[80, 80]} />
+        <MeshReflectorMaterial
+          blur={[300, 80]}
+          resolution={512}
+          mixBlur={0.9}
+          mixStrength={60}
+          roughness={0.85}
+          depthScale={1.0}
+          minDepthThreshold={0.4}
+          maxDepthThreshold={1.4}
+          color="#0d0d14"
+          metalness={0.9}
+        />
+      </mesh>
+
+      {/* ── Back Wall ── */}
+      <mesh position={[0, 9, -22]} receiveShadow>
+        <planeGeometry args={[80, 24]} />
+        <meshStandardMaterial color="#0b0b14" roughness={0.95} metalness={0.05} />
+      </mesh>
+
+      {/* ── Left Wall ── */}
+      <mesh rotation={[0, Math.PI / 2, 0]} position={[-22, 9, 0]} receiveShadow>
+        <planeGeometry args={[80, 24]} />
+        <meshStandardMaterial color="#090910" roughness={0.95} metalness={0.05} />
+      </mesh>
+
+      {/* ── Right Wall ── */}
+      <mesh rotation={[0, -Math.PI / 2, 0]} position={[22, 9, 0]} receiveShadow>
+        <planeGeometry args={[80, 24]} />
+        <meshStandardMaterial color="#090910" roughness={0.95} metalness={0.05} />
+      </mesh>
+
+      {/* ── Ceiling ── */}
+      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 13, 0]}>
+        <planeGeometry args={[80, 80]} />
+        <meshStandardMaterial color="#07070e" roughness={1} />
+      </mesh>
+
+      {/* ── LED Strip Lights (emissive bars) ── */}
+      {[-4, -1.3, 1.3, 4].map((x, i) => (
+        <mesh key={i} position={[x, 12.85, 0]}>
+          <boxGeometry args={[0.18, 0.06, 28]} />
+          <meshStandardMaterial
+            color="#ffffff"
+            emissive="#5599ff"
+            emissiveIntensity={3.5}
+            toneMapped={false}
+          />
+        </mesh>
+      ))}
+
+      {/* ── Overhead rect-area lights aimed at car ── */}
+      <rectAreaLight
+        width={8} height={1}
+        intensity={12}
+        color="#aabbff"
+        position={[0, 12, 0]}
+        rotation={[-Math.PI / 2, 0, 0]}
+      />
+      <rectAreaLight
+        width={4} height={1}
+        intensity={8}
+        color="#ffffff"
+        position={[0, 11, 5]}
+        rotation={[-Math.PI / 2.5, 0, 0]}
+      />
+    </group>
+  )
+}
+
 // ===== WELCOME TYPEWRITER (cycles through lines) =====
 function WelcomeTypewriter({ lines }) {
   const [lineIndex, setLineIndex] = useState(0)
@@ -190,58 +271,87 @@ function App() {
     }
   }, [])
 
-  // Track scroll position + control audio
+  // ===== SMOOTH SCROLL + AUDIO CONTROL =====
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
 
-    const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = container
-      const maxScroll = scrollHeight - clientHeight
-      const progress = maxScroll > 0 ? Math.max(0, Math.min(1, scrollTop / maxScroll)) : 0
-      scrollRef.current = progress
+    let targetScroll = 0
+    let currentScroll = 0
+    let rafId = null
+    const EASE = 0.09 // lower = slower/silkier, higher = snappier
 
+    // Cache layout dimensions — only recalculate on resize (avoids forced layout every RAF)
+    let maxScroll = Math.max(0, container.scrollHeight - container.clientHeight)
+    const resizeObserver = new ResizeObserver(() => {
+      maxScroll = Math.max(0, container.scrollHeight - container.clientHeight)
+      targetScroll = Math.min(targetScroll, maxScroll)
+    })
+    resizeObserver.observe(container)
+
+    const stopAudio = () => {
+      const audio = audioRef.current
+      if (!audio) return
+      audio.pause()
+      audio.currentTime = 7
+      audioStarted.current = false
+      if (scrollTimeout.current) clearTimeout(scrollTimeout.current)
+    }
+
+    const updateAudio = (progress, isAtBottom) => {
       const audio = audioRef.current
       if (!audio || !audioUnlocked.current) return
 
-      if (progress > 0.01) {
-        // Start audio on first scroll
-        if (!audioStarted.current) {
-          audio.currentTime = 7
-          audio.play().catch(() => { })
-          audioStarted.current = true
-        }
-
-        // Resume if paused from idle
-        if (audio.paused && audioStarted.current) {
-          audio.play().catch(() => { })
-        }
-
-        // Clear pending pause timeout
-        if (scrollTimeout.current) {
-          clearTimeout(scrollTimeout.current)
-        }
-
-        // Pause after 500ms of no scrolling
-        scrollTimeout.current = setTimeout(() => {
-          if (audio && !audio.paused) {
-            audio.pause()
-          }
-        }, 500)
-
-      } else {
-        // Back at top — stop and reset
-        audio.pause()
-        audio.currentTime = 7
-        audioStarted.current = false
-        if (scrollTimeout.current) {
-          clearTimeout(scrollTimeout.current)
-        }
+      if (progress <= 0.01 || isAtBottom) {
+        stopAudio()
+        return
       }
+
+      if (!audioStarted.current) {
+        audio.currentTime = 7
+        audio.play().catch(() => { })
+        audioStarted.current = true
+      }
+      if (audio.paused && audioStarted.current) {
+        audio.play().catch(() => { })
+      }
+      if (scrollTimeout.current) clearTimeout(scrollTimeout.current)
+      scrollTimeout.current = setTimeout(() => {
+        if (audio && !audio.paused) audio.pause()
+      }, 500)
     }
 
-    container.addEventListener('scroll', handleScroll, { passive: true })
-    return () => container.removeEventListener('scroll', handleScroll)
+    const tick = () => {
+      const diff = targetScroll - currentScroll
+      if (Math.abs(diff) < 0.5) {
+        currentScroll = targetScroll
+        container.scrollTop = currentScroll
+      } else {
+        currentScroll += diff * EASE
+        container.scrollTop = currentScroll
+      }
+
+      const progress = maxScroll > 0 ? Math.max(0, Math.min(1, currentScroll / maxScroll)) : 0
+      const isAtBottom = maxScroll > 0 && targetScroll >= maxScroll - 1
+      scrollRef.current = progress
+      updateAudio(progress, isAtBottom)
+
+      rafId = requestAnimationFrame(tick)
+    }
+
+    const handleWheel = (e) => {
+      e.preventDefault()
+      targetScroll = Math.max(0, Math.min(maxScroll, targetScroll + e.deltaY))
+    }
+
+    container.addEventListener('wheel', handleWheel, { passive: false })
+    rafId = requestAnimationFrame(tick)
+
+    return () => {
+      container.removeEventListener('wheel', handleWheel)
+      cancelAnimationFrame(rafId)
+      resizeObserver.disconnect()
+    }
   }, [])
 
   return (
@@ -250,36 +360,66 @@ function App() {
       <div className="canvas-fixed">
         <Canvas
           camera={{ position: [12, 4, 10], fov: 45 }}
-          shadows
-          dpr={[1, 2]}
+          dpr={[1, 1.5]}
           onCreated={() => {
             setTimeout(() => setModelLoaded(true), 20000)
           }}
         >
           <Suspense fallback={null}>
-            <ambientLight intensity={0.3} />
-            <directionalLight
-              position={[10, 10, 5]}
-              intensity={1.5}
-              castShadow
-              shadow-mapSize-width={2048}
-              shadow-mapSize-height={2048}
-            />
+            {/* Showroom ambient — low so spotlights pop */}
+            <ambientLight intensity={0.15} />
+
+            {/* Key spotlight — no castShadow; ContactShadows handles floor shadow */}
             <spotLight
-              position={[-10, 15, -5]}
-              angle={0.3}
-              penumbra={1}
-              intensity={0.8}
-              castShadow
+              position={[8, 12, 8]}
+              angle={0.28}
+              penumbra={0.6}
+              intensity={4}
+              color="#ffffff"
             />
-            <Environment preset="city" />
+            {/* Fill spotlight — no shadow (visual only) */}
+            <spotLight
+              position={[-8, 11, 4]}
+              angle={0.3}
+              penumbra={0.8}
+              intensity={2.5}
+              color="#cce0ff"
+            />
+            {/* Rear rim light — no shadow */}
+            <spotLight
+              position={[0, 10, -10]}
+              angle={0.35}
+              penumbra={1}
+              intensity={2}
+              color="#8ab4ff"
+            />
+            {/* Top-down showroom beam — no shadow */}
+            <spotLight
+              position={[0, 14, 0]}
+              angle={0.22}
+              penumbra={0.5}
+              intensity={5}
+              color="#ffffff"
+            />
+
+            {/* Studio HDRI for reflections (no background) */}
+            <Environment preset="studio" />
+
+            {/* Showroom room geometry */}
+            <Showroom />
+
+            {/* The Car */}
             <BmwModel scale={1} position={[0, -0.5, 0]} />
+
+            {/* Baked shadow beneath the car — frames=1 renders once, not every frame */}
             <ContactShadows
-              position={[0, -0.5, 0]}
-              opacity={0.5}
-              scale={12}
-              blur={2.5}
-              far={4}
+              position={[0, -0.49, 0]}
+              opacity={0.8}
+              scale={14}
+              blur={3}
+              far={5}
+              frames={1}
+              color="#000010"
             />
             <ScrollCamera scrollRef={scrollRef} />
           </Suspense>
@@ -477,6 +617,19 @@ function App() {
             <div className="welcome-text-wrapper">
               <WelcomeTypewriter lines={WELCOME_LINES} />
             </div>
+
+            {/* Skip Intro button */}
+            <button
+              id="skip-intro-btn"
+              className="skip-intro-btn"
+              onClick={() => setModelLoaded(true)}
+            >
+              Skip Intro
+              <svg className="skip-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+                <polyline points="15 18 21 12 15 6" />
+              </svg>
+            </button>
           </div>
         </div>
       )}
