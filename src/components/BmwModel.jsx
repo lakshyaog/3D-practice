@@ -2,7 +2,10 @@ import React, { useRef, useEffect } from 'react'
 import { useGLTF } from '@react-three/drei'
 
 /**
- * BmwModel - Renders the BMW M4 Competition 3D model
+ * BmwModel — Renders the BMW M4 Competition 3D GLTF model.
+ * Enables shadow casting on every mesh automatically.
+ * Uses frustumCulled={false} to prevent pop-in during wide camera sweeps.
+ *
  * @param {object} props - Standard Three.js mesh props (position, scale, rotation, etc.)
  */
 const BmwModel = (props) => {
@@ -23,6 +26,7 @@ const BmwModel = (props) => {
         <primitive
             ref={modelRef}
             object={scene}
+            frustumCulled={false}
             {...props}
         />
     )

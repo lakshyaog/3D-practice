@@ -1,3 +1,7 @@
+/**
+ * TypewriterText — lightweight typewriter animation for inline text.
+ * Respects the user's `prefers-reduced-motion` setting.
+ */
 import { useEffect, useRef, useState } from "react"
 
 function useReducedMotion() {
@@ -14,11 +18,12 @@ function useReducedMotion() {
     return shouldReduceMotion
 }
 
-const LOOP_RESTART_DELAY_MS = 1000
+const LOOP_RESTART_DELAY_MS = 1500
 
 const TypewriterText = ({
     children,
     speed = 50,
+    deletingSpeed = 30,
     loop = false,
     className = "",
 }) => {
@@ -41,10 +46,19 @@ const TypewriterText = ({
                 index.current++
                 timeout.current = setTimeout(type, speed)
             } else if (loop) {
+                // Pause, then erase character by character before restarting
                 timeout.current = setTimeout(() => {
-                    setDisplayed("")
-                    index.current = 0
-                    type()
+                    function erase() {
+                        if (index.current > 0) {
+                            index.current--
+                            setDisplayed(children.slice(0, index.current))
+                            timeout.current = setTimeout(erase, deletingSpeed)
+                        } else {
+                            setDisplayed("")
+                            type()
+                        }
+                    }
+                    erase()
                 }, LOOP_RESTART_DELAY_MS)
             }
         }
@@ -55,7 +69,7 @@ const TypewriterText = ({
                 clearTimeout(timeout.current)
             }
         }
-    }, [children, speed, loop, shouldReduceMotion])
+    }, [children, speed, deletingSpeed, loop, shouldReduceMotion])
 
     return <span className={className}>{displayed}</span>
 }

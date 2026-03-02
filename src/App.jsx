@@ -279,7 +279,7 @@ function App() {
     let targetScroll = 0
     let currentScroll = 0
     let rafId = null
-    const EASE = 0.09 // lower = slower/silkier, higher = snappier
+    const EASE = 0.09 // 0.05 = silky butter | 0.09 = responsive | 0.15 = snappy
 
     // Cache layout dimensions — only recalculate on resize (avoids forced layout every RAF)
     let maxScroll = Math.max(0, container.scrollHeight - container.clientHeight)
@@ -601,7 +601,11 @@ function App() {
         <div className="logo">
           <img src="/bmw.jpeg" alt="BMW Logo" className="bmw-logo" />
         </div>
-
+        <nav className="nav-links">
+          <a href="#" className="nav-link active">Overview</a>
+          <a href="#" className="nav-link">Performance</a>
+          <a href="#" className="nav-link">Configure</a>
+        </nav>
       </motion.header>
 
 
@@ -614,11 +618,7 @@ function App() {
             className="loading-image"
           />
           <div className="welcome-overlay">
-            <div className="welcome-text-wrapper">
-              <WelcomeTypewriter lines={WELCOME_LINES} />
-            </div>
-
-            {/* Skip Intro button */}
+            {/* Skip Intro button — top right */}
             <button
               id="skip-intro-btn"
               className="skip-intro-btn"
@@ -630,6 +630,10 @@ function App() {
                 <polyline points="15 18 21 12 15 6" />
               </svg>
             </button>
+
+            <div className="welcome-text-wrapper">
+              <WelcomeTypewriter lines={WELCOME_LINES} />
+            </div>
           </div>
         </div>
       )}
