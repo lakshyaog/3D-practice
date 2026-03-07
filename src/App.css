@@ -1,4 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&display=swap');
 
 /* ===== RESET ===== */
 * {
@@ -319,6 +324,27 @@ body,
 }
 
 .hero-description {
+  /* Try one of these font options: */
+  
+  /* Option 1: Playfair Display - Elegant serif, luxury feel */
+  font-family: 'Playfair Display', serif;
+  
+  /* Option 2: Cormorant Garamond - Classic, refined serif */
+  /* font-family: 'Cormorant Garamond', serif; */
+  
+  /* Option 3: Crimson Text - Traditional, readable serif */
+  /* font-family: 'Crimson Text', serif; */
+  
+  /* Option 4: Lora - Modern serif with personality */
+  /* font-family: 'Lora', serif; */
+  
+  /* Option 5: Space Grotesk - Modern geometric sans */
+  /* font-family: 'Space Grotesk', sans-serif; */
+  
+  /* Option 6: Inter Light - Original (lighter weight) */
+  /* font-family: 'Inter', sans-serif;
+  font-weight: 300; */
+  
   font-size: 0.92rem;
   line-height: 1.8;
   color: rgba(255, 255, 255, 0.45);

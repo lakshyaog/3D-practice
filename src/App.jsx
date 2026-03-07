@@ -603,8 +603,6 @@ function App() {
         </div>
         <nav className="nav-links">
           <a href="#" className="nav-link active">Overview</a>
-          <a href="#" className="nav-link">Performance</a>
-          <a href="#" className="nav-link">Configure</a>
         </nav>
       </motion.header>
 
