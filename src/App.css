@@ -192,7 +192,7 @@ body,
 /* ===== SECTION TEXT ===== */
 .section-text {
   font-size: 0.92rem;
-  line-height: 1.8;
+  line-height: 1.85;
   color: rgba(255, 255, 255, 0.5);
   font-weight: 400;
   margin-bottom: 28px;
@@ -201,6 +201,7 @@ body,
 .highlight {
   color: #4db8ff;
   font-weight: 600;
+  text-shadow: 0 0 10px rgba(77, 184, 255, 0.3);
 }
 
 /* ===== SPEC GRID ===== */
@@ -244,8 +245,8 @@ body,
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(0, 102, 177, 0.1);
-  border: 1px solid rgba(0, 102, 177, 0.2);
+  background: rgba(0, 102, 177, 0.12);
+  border: 1px solid rgba(0, 102, 177, 0.25);
   color: #4db8ff;
   font-size: 0.65rem;
   font-weight: 600;
@@ -328,6 +329,7 @@ body,
   
   /* Option 1: Playfair Display - Elegant serif, luxury feel */
   font-family: 'Playfair Display', serif;
+  letter-spacing: 0.3px;
   
   /* Option 2: Cormorant Garamond - Classic, refined serif */
   /* font-family: 'Cormorant Garamond', serif; */
@@ -364,9 +366,9 @@ body,
 .scroll-hint-text {
   font-size: 0.65rem;
   font-weight: 500;
-  letter-spacing: 3px;
+  letter-spacing: 3.5px;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.3);
 }
 
 .scroll-hint-line {
@@ -440,7 +442,7 @@ body,
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 30px rgba(0, 102, 177, 0.5);
+  box-shadow: 0 8px 35px rgba(0, 102, 177, 0.6);
 }
 
 .btn-arrow {
@@ -506,7 +508,12 @@ body,
   height: 40px;
   object-fit: contain;
   border-radius: 50%;
-  filter: drop-shadow(0 0 8px rgba(0, 160, 233, 0.2));
+  filter: drop-shadow(0 0 10px rgba(0, 160, 233, 0.25));
+  transition: filter 0.3s ease;
+}
+
+.bmw-logo:hover {
+  filter: drop-shadow(0 0 15px rgba(0, 160, 233, 0.4));
 }
 
 .nav-links {

@@ -15,7 +15,7 @@ RectAreaLightUniformsLib.init()
 // ===== WELCOME SCREEN LINES =====
 const WELCOME_LINES = [
   'Welcome to the future of driving',
-  'Where precision meets passion',
+  'Where precision engineering meets passion',
   'Engineered for those who lead',
   'Designed for those who dare',
   "Performance you don't just drive",
@@ -219,7 +219,7 @@ function WelcomeTypewriter({ lines }) {
 // ===== TYPEWRITER SEQUENCES =====
 const BMW_SEQUENCES = [
   { text: 'The New BMW M4 Competition', deleteAfter: true, pauseAfter: 2500 },
-  { text: '530 HP · S58 Engine', deleteAfter: true, pauseAfter: 2000 },
+  { text: '530 HP · S58 Twin-Turbo Engine', deleteAfter: true, pauseAfter: 2000 },
   { text: 'Born on the Racetrack', deleteAfter: false, pauseAfter: 3000 },
 ]
 
@@ -455,7 +455,7 @@ function App() {
             />
 
             <p className="hero-description">
-              The New M4 Competition M xDrive combines aesthetics and the sportiness
+              The New M4 Competition M xDrive combines stunning aesthetics and the sportiness
               you expect from BMW M.
             </p>
 
@@ -480,7 +480,7 @@ function App() {
             <span className="section-tag">EXTERIOR · SIDE PROFILE</span>
             <h2 className="section-title">Sculpted for Speed</h2>
             <p className="section-text">
-              The muscular side profile reveals the M4's widebody stance —
+              The muscular side profile reveals the M4's aggressive widebody stance —
               flared fenders house massive 19" forged wheels, while the carbon-fiber
               roof line drops aggressively toward the rear. Every crease is
               aerodynamically optimized for <span className="highlight">maximum downforce</span>.
@@ -508,7 +508,7 @@ function App() {
             viewport={{ once: false, amount: 0.4 }}
           >
             <span className="section-tag">EXTERIOR · REAR</span>
-            <h2 className="section-title">Aerodynamic Precision</h2>
+            <h2 className="section-title">Aerodynamic Excellence</h2>
             <p className="section-text">
               The rear diffuser and quad exhaust tips are pure M DNA. A subtle
               lip spoiler and aggressive bumper design channel airflow for
@@ -580,7 +580,7 @@ function App() {
             </p>
             <div className="cta-buttons">
               <button className="btn-primary" id="discover-btn">
-                Configure Yours
+                Build Your M4
                 <span className="btn-arrow">→</span>
               </button>
               <button className="btn-secondary" id="configure-btn">
