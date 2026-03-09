@@ -36,8 +36,8 @@ const WELCOME_LINES = [
   'A legacy of performance',
   'A promise of perfection',
   'This is not just a car',
-  "It's a statement",
-  "It's confidence",
+  "It's a statement of intent",
+  "It's confidence on wheels",
   "It's control",
   "It's evolution",
   "It's ambition in motion",
@@ -478,7 +478,7 @@ function App() {
             viewport={{ once: false, amount: 0.4 }}
           >
             <span className="section-tag">EXTERIOR · SIDE PROFILE</span>
-            <h2 className="section-title">Sculpted for Speed</h2>
+            <h2 className="section-title">Sculpted for Performance</h2>
             <p className="section-text">
               The muscular side profile reveals the M4's aggressive widebody stance —
               flared fenders house massive 19" forged wheels, while the carbon-fiber
@@ -510,7 +510,7 @@ function App() {
             <span className="section-tag">EXTERIOR · REAR</span>
             <h2 className="section-title">Aerodynamic Excellence</h2>
             <p className="section-text">
-              The rear diffuser and quad exhaust tips are pure M DNA. A subtle
+              The rear diffuser and quad exhaust tips showcase pure M DNA. A subtle
               lip spoiler and aggressive bumper design channel airflow for
               stability at <span className="highlight">290 km/h</span>. The iconic
               L-shaped taillights complete the unmistakable M4 signature.
