@@ -234,9 +234,9 @@ body,
 .spec-unit {
   font-size: 0.6rem;
   font-weight: 500;
-  letter-spacing: 2px;
+  letter-spacing: 2.5px;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.35);
 }
 
 /* ===== HERO SECTION SPECIFICS ===== */
