@@ -49,8 +49,8 @@ const WELCOME_LINES = [
 // Full exterior orbit — camera stays outside the car at all times
 const CAMERA_KEYFRAMES = [
   // --- Wide establishing shots ---
-  { pos: [12, 4, 10], target: [0, 0, 0] },       // 0%  - front-right wide establishing
-  { pos: [0, 3.5, 14], target: [0, 0, 0] },      // 20% - pure right side
+  { pos: [12, 4, 10], target: [0, 0, 0] },       // 0%  - front-right wide establishing shot
+  { pos: [0, 3.5, 14], target: [0, 0, 0] },      // 20% - pure right side view
   { pos: [-12, 3.5, 6], target: [0, 0, 0] },     // 40% - front-left angle
   { pos: [-8, 3, -10], target: [0, 0, 0] },      // 60% - rear-left quarter
 
