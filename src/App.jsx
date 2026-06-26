@@ -31,7 +31,7 @@ const WELCOME_LINES = [
   'Speed with purpose',
   'Control in every single detail',
   'Where technology becomes emotion',
-  'Where roads become experiences',
+  'Where roads transform into experiences',
   'Built for the bold',
   'Made for the visionary',
   'A legacy of performance',
