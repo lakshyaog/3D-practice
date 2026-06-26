@@ -22,6 +22,7 @@ const WELCOME_LINES = [
   'You feel it',
   'Every curve, every line',
   'Every acceleration',
+  'Every heartbeat',
   'Every moment',
   'Crafted with German excellence',
   'Powered by innovation',
