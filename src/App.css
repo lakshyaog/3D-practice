@@ -20,6 +20,7 @@ body,
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background: #010409;
   color: white;
+  overflow-x: hidden;
 }
 
 /* ===== APP ROOT ===== */
