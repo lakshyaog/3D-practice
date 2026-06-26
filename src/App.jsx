@@ -18,7 +18,7 @@ const WELCOME_LINES = [
   'Where precision engineering meets passion',
   'Engineered for those who lead',
   'Designed for those who dare',
-  "Performance you don't just drive",
+  "Performance you don't just drive — you experience it",
   'You feel it',
   'Every curve',
   'Every acceleration',
