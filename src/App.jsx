@@ -20,7 +20,7 @@ const WELCOME_LINES = [
   'Designed for those who dare',
   "Performance you don't just drive — you experience it",
   'You feel it',
-  'Every curve',
+  'Every curve, every line',
   'Every acceleration',
   'Every moment',
   'Crafted with German excellence',
