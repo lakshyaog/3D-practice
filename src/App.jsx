@@ -29,7 +29,7 @@ const WELCOME_LINES = [
   'Driven by pure intelligence',
   'Luxury without compromise',
   'Speed with purpose',
-  'Control in every detail',
+  'Control in every single detail',
   'Where technology becomes emotion',
   'Where roads become experiences',
   'Built for the bold',
