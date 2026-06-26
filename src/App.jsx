@@ -26,7 +26,7 @@ const WELCOME_LINES = [
   'Every moment',
   'Crafted with German excellence',
   'Powered by innovation',
-  'Driven by intelligence',
+  'Driven by pure intelligence',
   'Luxury without compromise',
   'Speed with purpose',
   'Control in every detail',
