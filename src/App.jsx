@@ -538,7 +538,7 @@ function App() {
             transition={{ duration: 0.9, ease: 'easeOut' }}
             viewport={{ once: false, amount: 0.4 }}
           >
-            <span className="section-tag">POWERTRAIN · HEART</span>
+            <span className="section-tag">POWERTRAIN · S58 HEART</span>
             <h2 className="section-title">The Iconic S58</h2>
             <p className="section-text">
               Step closer. The iconic S58 inline-6 engine pushes out a mighty
