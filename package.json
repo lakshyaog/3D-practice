@@ -1,7 +1,7 @@
 {
   "name": "3d-practice",
   "private": true,
-  "version": "0.0.393",
+  "version": "0.0.394",
   "type": "module",
   "scripts": {
     "dev": "vite",
